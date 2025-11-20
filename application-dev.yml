@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/healthcare_integration_dev
+    username: integration_user
+    password: integration_pass
+  jpa:
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+
+app:
+  auth:
+    api-key: local-dev-key
+

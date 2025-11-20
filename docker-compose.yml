@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: integration-postgres
+    environment:
+      POSTGRES_DB: healthcare_integration
+      POSTGRES_USER: integration_user
+      POSTGRES_PASSWORD: integration_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.9
+    container_name: integration-redpanda
+    command:
+      - redpanda
+      - start
+      - --smp
+      - "1"
+      - --memory
+      - 1G
+      - --mode
+      - dev-container
+      - --overprovisioned
+    ports:
+      - "9092:9092"
+      - "9644:9644"
+    environment:
+      - REDPANDA_AUTO_CREATE_TOPICS_ENABLED=true
+
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v2.5.2
+    container_name: integration-redpanda-console
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      REDPANDA_ADMIN_API: redpanda:9644
+    depends_on:
+      - redpanda
+
+volumes:
+  postgres-data:
+

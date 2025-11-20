@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: healthcare-integration-service
+  datasource:
+    url: ${JDBC_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:healthcare_integration}}
+    username: ${DB_USERNAME:integration_user}
+    password: ${DB_PASSWORD:integration_pass}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  cloud:
+    stream:
+      bindings:
+        observationNormalization-out-0:
+          destination: observation-normalization
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+          autoCreateTopics: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    com.healthbridge.integration: DEBUG
+
+app:
+  auth:
+    api-key: ${APP_API_KEY:local-dev-key}
+
